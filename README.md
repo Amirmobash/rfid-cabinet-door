@@ -1,189 +1,57 @@
-# 🔐 RFID Cabinet Door Lock – Intelligentes RFID‑Türschloss für Werkzeugschränke
+# RFID cabinet door controller
 
-**Robuste Arduino‑basierte Zutrittskontrolle für industrielle Werkzeugschränke, Lagerboxen und Kiosk‑Systeme.**  
-Entwickelt von **Amirmobasheraghdam** – einsatzbereit 24/7, einfach zu integrieren und wartungsfreundlich.
+An MFRC522 cabinet-access prototype with two stored seven-byte UIDs, a 100 ms active-HIGH relay pulse and a three-second serial heartbeat. Author: **Amirmobasheraghdam**.
 
-[![Arduino](https://img.shields.io/badge/Arduino-IDE-00979D.svg)](https://www.arduino.cc/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)]()
+## Reproducible build
 
----
+Install Python 3 and **Arduino CLI 1.3.1**, then run from this repository:
 
-## 📋 Inhaltsverzeichnis
-- [Überblick](#-überblick)
-- [Features](#-features)
-- [Anwendungsfälle](#-anwendungsfälle)
-- [Hardware‑Anforderungen](#-hardware‑anforderungen)
-- [Schaltplan / Verdrahtung](#-schaltplan--verdrahtung)
-- [Installation](#-installation)
-- [Konfiguration](#-konfiguration)
-- [Serielle Kommunikation (Integration mit PC)](#-serielle-kommunikation-integration-mit-pc)
-- [Fehlerbehebung](#-fehlerbehebung)
-- [Lizenz](#-lizenz)
-- [Autor & Kontakt](#-autor--kontakt)
-
----
-
-## 🔍 Überblick
-
-Dieses Projekt realisiert eine **RFID‑gesteuerte Türöffnung** für Werkzeugschränke, Schränke mit Elektroschlössern oder Kiosk‑Boxen.  
-Ein Arduino liest die UID eines RFID‑Tags, vergleicht sie mit hinterlegten Schlüsseln und aktiviert bei Erfolg für kurze Zeit ein Relais. Dieses Relais schaltet dann ein **Türöffnermagneteschloss** oder einen **Elektroriegel** frei.
-
-Die Firmware ist bewusst einfach und stabil gehalten – ideal für den Dauerbetrieb in der Werkstatt oder Industrie. Über die serielle Schnittstelle kann sie mit einer Windows‑Kiosk‑App kommunizieren, die Zugriffe protokolliert oder weitere Logik übernimmt.
-
----
-
-## ✨ Features
-
-- ✅ **RFID‑Authentifizierung** – Karte vorhalten, Tür öffnet sich.
-- ✅ **Relais‑Ausgang** – Schaltet ein externes Schloss (Magnet, Türöffner, Riegel).
-- ✅ **Zwei autorisierte Schlüssel** (im Code hinterlegte UIDs für Ehsan und Amir) – leicht erweiterbar.
-- ✅ **Ping‑Funktion** – Regelmäßiges „Ich bin online“-Signal über serielle Schnittstelle (alle 3 Sekunden).
-- ✅ **Unbekannte Karten werden ausgegeben** – Nützlich zum Einlernen neuer Karten.
-- ✅ **Robuster Loop** – Keine Blockaden, sofort bereit für nächste Karte.
-- ✅ **Kompatibel mit MFRC522** – dem am weitesten verbreiteten RFID‑Modul.
-- ✅ **Einfach erweiterbar** – für mehrere Türen, Türkontakte (Reed‑Schalter) oder erweiterte Logik.
-
----
-
-## 🏭 Anwendungsfälle
-
-- **Werkzeugschrank** – Nur berechtigte Mitarbeiter erhalten Zugriff.
-- **Industrieller Kiosk** – Schrank öffnet sich nach Kartenvorlage.
-- **Lagerbox / Spind** – RFID‑basierte Schliessfachsteuerung.
-- **Zutrittskontrolle für Technikräume** – mit Protokollierung über PC.
-- **Inventarschrank in der Werkstatt** – Zugriff nur mit autorisiertem Chip.
-
----
-
-## 🧰 Hardware‑Anforderungen
-
-| Komponente | Empfehlung / Typ |
-|------------|------------------|
-| Mikrocontroller | Arduino Uno, Mega, Nano (oder kompatibel) |
-| RFID‑Leser | MFRC522 (SPI‑Schnittstelle) |
-| Relais‑Modul | 1‑Kanal (für 5V / 12V je nach Schloss) |
-| Schloss | Elektrischer Türöffner, Magneteschloss (AC/DC je nach Typ) |
-| Externes Netzteil | Für das Schloss (niemals über Arduino versorgen!) |
-| Kabel | Jumperkabel, ggf. abgeschirmte Leitungen für störungsarme Umgebungen |
-
-> ⚠️ **Wichtig:** Türschlösser benötigen oft 12V und mehrere Ampere. Verwende immer ein separates Netzteil für das Schloss und schalte es über das Relais. Arduino und Relais dürfen nur die gemeinsame Masse verbinden.
-
----
-
-## 🔌 Schaltplan / Verdrahtung
-
-### MFRC522 an Arduino
-
-| MFRC522 | Arduino |
-|---------|---------|
-| SDA     | 10      |
-| SCK     | 13      |
-| MOSI    | 11      |
-| MISO    | 12      |
-| IRQ     | nicht verbunden |
-| GND     | GND     |
-| RST     | 5       |
-| 3.3V    | 3.3V    |
-
-### Relais an Arduino
-
-| Relais‑Modul | Arduino |
-|--------------|---------|
-| IN / Signal  | A5      |
-| VCC          | 5V (oder externe 5V, falls Modul viel Strom zieht) |
-| GND          | GND (gemeinsam mit Arduino) |
-
-### Schloss extern versorgen
-
-- **Relais‑Kontakt (COM / NO)** in Reihe mit dem Schloss und dessen eigenem Netzteil schalten.
-- Achte auf ausreichende Dimensionierung der Relais‑Kontakte (Spannung / Strom).
-
----
-
-## 🛠 Installation
-
-1. **Arduino IDE** herunterladen und installieren.
-2. Benötigte Bibliotheken installieren:
-   - `MFRC522` von GithubCommunity (über Bibliotheksverwalter)
-   - `TimerOne` (ebenfalls über Bibliotheksverwalter)
-3. Dieses Repository klonen oder die `.ino`-Datei herunterladen.
-4. Sketch in der IDE öffnen.
-5. **Autorisierte UIDs** anpassen (siehe Konfiguration).
-6. Board und COM‑Port auswählen.
-7. Sketch auf den Arduino hochladen.
-8. Seriellen Monitor öffnen (9600 Baud) – dort erscheinen Meldungen und die Ping‑Nachrichten.
-
----
-
-## ⚙ Konfiguration
-
-Die wichtigsten Einstellungen findest du am Anfang der `.ino`-Datei:
-
-```cpp
-// ==================== Leser-Identifikation ====================
-const String READER_ID       = "3";
-const String MELDUNG_KARTE   = "Karte erkannt!:" + READER_ID;
-const String MELDUNG_ONLINE  = "Ich bin online:" + READER_ID;
-
-// ==================== Autorisierte Schlüssel-UIDs ====================
-const byte UID_EHSAN[7] = {0x1D, 0x63, 0x25, 0xAE, 0x02, 0x10, 0x80};
-const byte UID_AMIR[7]  = {0x1D, 0xF6, 0x31, 0xAE, 0x02, 0x10, 0x80};
+```bash
+python3 tools/check_firmware.py --install
 ```
 
-- `READER_ID` kann geändert werden, wenn mehrere Leser im Einsatz sind.
-- Die UIDs kannst du durch eigene Werte ersetzen. Um eine unbekannte Karte auszulesen, halte sie vor den Leser – die Serielle Ausgabe zeigt die UID im Hex‑Format.
-- Die Relais‑Einschaltdauer (aktuell 100 ms) kann in den entsprechenden `delay(100)`-Zeilen angepasst werden.
+The helper installs `arduino:avr@1.8.6` and `MFRC522@1.4.12`, `TimerOne@1.1.1`. It compiles these alternatives
+separately in temporary folders, without uploading or rewriting the originals:
 
----
+- `rfid-cabinet-door.ino`
 
-## 💬 Serielle Kommunikation (Integration mit PC)
+Build target: `arduino:avr:uno`. Once dependencies are installed, omit `--install`
+to build offline. `--jobs 2` is the default. Set `ARDUINO_CLI` to a CLI executable
+or wrapper when using a custom Arduino configuration. Exact build inputs are in
+[`tools/firmware.json`](tools/firmware.json). Library dependencies are listed
+explicitly and installed with `--no-deps` so transitive updates cannot silently
+replace the pinned versions. These are tested build versions, not a claim that
+all other core/library versions are incompatible.
 
-Der Arduino sendet folgende Nachrichten an den Seriell‑Port (9600 Baud):
+The GitHub Actions workflow repeats the firmware checks on pushes and pull
+requests. Compilation validates software/toolchain compatibility; it does not
+establish hardware safety or successful physical operation.
 
-- **„Karte erkannt!:3“** – immer, wenn eine Karte gelesen wurde (gefolgt vom Namen oder der neuen UID).
-- **„Ich bin online:3“** – alle 3 Sekunden als Lebenszeichen.
-- **„Ehsan“** oder **„Amir“** – wenn einer der autorisierten Schlüssel erkannt wurde.
-- **„Neue ID: XX XX …“** – bei unbekannten Karten.
+## Signal assignments
 
-Eine angeschlossene PC‑Anwendung (z.B. in Python, C# oder als Kiosk‑App) kann diese Nachrichten auswerten, Zugriffe protokollieren, Alarme auslösen oder eine Whitelist verwalten.
+![Source-derived pin map](docs/wiring.svg)
 
----
+| Signal | Board pin |
+| --- | --- |
+| MFRC522 SS / SDA | D10 |
+| MFRC522 RST | D5 |
+| MFRC522 SCK | D13 |
+| MFRC522 MOSI | D11 |
+| MFRC522 MISO | D12 |
+| Relay input (active HIGH) | A5 |
 
-## 🐞 Fehlerbehebung
+## Operation and validation limits
 
-| Problem | Mögliche Lösung |
-|---------|-----------------|
-| Keine Reaktion beim Kartenvorhalten | Prüfe Verkabelung des RFID‑Moduls, Spannungsversorgung (3.3V), korrekte Pins. |
-| Relais schaltet nicht | Prüfe Relais‑Pin (A5), Logikpegel (HIGH = ein). Stelle sicher, dass die gemeinsame Masse verbunden ist. |
-| Türöffner bekommt keinen Strom | Externes Netzteil prüfen, Relais‑Kontakte richtig angeschlossen? |
-| Unbekannte Karte wird nicht ausgegeben | Seriellen Monitor geöffnet? Baudrate 9600? |
-| Ping erscheint nicht | TimerOne‑Bibliothek installiert? Interruptkonflikt? |
+The pin map is for an Uno: a Mega uses different hardware-SPI pins. Verify 3.3 V RC522 power, appropriate logic-level adaptation and the relay module interface. A5 is used as a relay output, so it is not available for an I2C SCL connection in this sketch. Use a properly rated external lock supply; no load power circuit is specified here. Serial messages use **9600 baud**.
 
----
+The UID comparison now requires an exact seven-byte match. Previously a matching four-byte prefix could be accepted, and a longer card could read beyond the stored UID. Tests cover matching, prefix, longer, different, empty and null inputs with memory sanitizers. **This changes authentication decisions and must receive security/hardware validation before merging or deployment.** UID-only authorization is not cryptographic access control. Relay timing and stored UID values are unchanged.
 
-## 📄 Lizenz
-
-Dieses Projekt steht unter der **MIT‑Lizenz**.  
-Du darfst es frei verwenden, anpassen und weitergeben – eine Quellenangabe wird geschätzt.
-
----
-
-## 👤 Autor & Kontakt
-
-- **Amirmobasheraghdam**  
-- 🔗 [LinkedIn](https://www.linkedin.com/in/amirmobasher)  
-- 🐙 [GitHub](https://github.com/amirmobasheraghdam)  
-- 📧 bei Fragen gerne eine Issue öffnen oder direkt kontaktieren.
-
----
-
-## 🏷️ Hashtags / Keywords
-
-`#RFID` `#Arduino` `#Türschloss` `#Zutrittskontrolle` `#Werkzeugschrank` `#Industrie` `#SmartCabinet` `#MFRC522` `#Relais` `#Amirmobasheraghdam` `#OpenSource` `#MITLizenz` `#Elektroschloss` `#KioskSystem`
-
----
-
-**Viel Erfolg mit deinem RFID‑Türschloss!**  
-Bei Verbesserungsvorschlägen oder Fragen – ich freue mich auf dein Feedback.
+```bash
+g++ -std=c++11 -Wall -Wextra -Werror -fsanitize=address,undefined \
+  -fno-omit-frame-pointer tests/test_uid.cpp -o /tmp/uid-tests
+/tmp/uid-tests
 ```
+
+No physical testing, new hardware photographs or measured electrical/optical
+performance is claimed. Retain the author attribution and existing license/source
+notices when reusing the project.
