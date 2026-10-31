@@ -28,6 +28,7 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <TimerOne.h>
+#include "uid_match.h"
 
 // ==================== PIN-Konfiguration ====================
 #define SS_PIN      10      // SDA (Slave Select) für MFRC522
@@ -49,21 +50,6 @@ const byte UID_AMIR[7]  = {0x1D, 0xF6, 0x31, 0xAE, 0x02, 0x10, 0x80};
 MFRC522 rfid(SS_PIN, RST_PIN);   // RFID-Leser
 
 // ==================== Hilfsfunktionen ====================
-
-/**
- * Vergleicht zwei UID‑Arrays miteinander.
- * 
- * @param uid1  Erstes Array (z.B. gelesene UID)
- * @param uid2  Zweites Array (hinterlegte UID)
- * @param len   Länge der Arrays (bei MFRC522 meist 4, 7 oder 10)
- * @return true wenn beide Arrays byte‑gleich sind, sonst false
- */
-bool uidIstGleich(byte *uid1, byte *uid2, byte len) {
-  for (byte i = 0; i < len; i++) {
-    if (uid1[i] != uid2[i]) return false;
-  }
-  return true;
-}
 
 /**
  * Gibt die gelesene UID im hexadezimalen Format auf der seriellen Schnittstelle aus.
@@ -123,13 +109,13 @@ void loop() {
   byte uidLaenge    = rfid.uid.size;
 
   // Prüfen, ob es sich um einen autorisierten Schlüssel handelt
-  if ( uidIstGleich(geleseneUID, (byte*)UID_EHSAN, uidLaenge) ) {
+  if ( uidMatches(geleseneUID, uidLaenge, UID_EHSAN) ) {
     Serial.println("Ehsan");                 // Name ausgeben
     digitalWrite(RELAY_PIN, HIGH);            // Tür öffnen (Relais an)
     delay(100);                               // 100 ms Impuls
     digitalWrite(RELAY_PIN, LOW);             // Tür wieder verriegeln
   }
-  else if ( uidIstGleich(geleseneUID, (byte*)UID_AMIR, uidLaenge) ) {
+  else if ( uidMatches(geleseneUID, uidLaenge, UID_AMIR) ) {
     Serial.println("Amir");
     digitalWrite(RELAY_PIN, HIGH);
     delay(100);

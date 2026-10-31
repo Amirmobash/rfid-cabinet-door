@@ -1,0 +1,11 @@
+{
+  "core": "arduino:avr@1.8.6",
+  "fqbn": "arduino:avr:uno",
+  "libs": [
+    "MFRC522@1.4.12",
+    "TimerOne@1.1.1"
+  ],
+  "sources": [
+    "rfid-cabinet-door.ino"
+  ]
+}
