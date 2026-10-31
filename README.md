@@ -55,3 +55,7 @@ g++ -std=c++11 -Wall -Wextra -Werror -fsanitize=address,undefined \
 No physical testing, new hardware photographs or measured electrical/optical
 performance is claimed. Retain the author attribution and existing license/source
 notices when reusing the project.
+
+## License
+
+The project is provided under the **MIT License**, as stated in the original project documentation. Retain the author attribution.
